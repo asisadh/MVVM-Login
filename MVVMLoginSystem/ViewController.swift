@@ -7,19 +7,36 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class ViewController: UIViewController {
-
+    @IBOutlet weak var txtuserName: UITextField!
+    @IBOutlet weak var txtPassword: UITextField!
+    @IBOutlet weak var lblEnable: UILabel!
+    @IBOutlet weak var btnLogin: UIButton!
+    
+    let viewModel = LoginViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        //Binding the View to ViewModel
+        _ = txtuserName.rx.text.map { $0 ?? "" }.bind(to: viewModel.emailText)
+        _ = txtPassword.rx.text.map { $0 ?? "" }.bind(to: viewModel.passwordText)
+        
+        _ = viewModel.isValid.bind(to: btnLogin.rx.isEnabled)
+        
+        _ = viewModel.isValid.subscribe(onNext: { [weak self] isValid in
+                self!.lblEnable.text = isValid ? "Enable" : "Not Enable"
+                self?.lblEnable.textColor = isValid ? .green : .red
+                print("isValid \(isValid)")
+            }, onError: nil, onCompleted: nil, onDisposed: nil)
+
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    @IBAction func btnClicked(_ sender: UIButton) {
     }
-
-
+    
 }
 
